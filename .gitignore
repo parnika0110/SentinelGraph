@@ -1,0 +1,28 @@
+# --- Python ---
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# --- Node / Next.js ---
+node_modules/
+frontend/.next/
+frontend/out/
+*.tsbuildinfo
+
+# --- Env & secrets ---
+.env
+.env.local
+.env*.local
+
+# --- Logs & OS ---
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# --- Tooling ---
+.freebuff/
+.vscode/
+.idea/

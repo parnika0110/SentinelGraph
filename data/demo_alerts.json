@@ -1,0 +1,236 @@
+{
+  "description": "SentinelGraph synthetic demo dataset (Graph Hacks 2026). All data is fabricated: synthetic hostnames, RFC 5737 documentation IP ranges (198.51.100.0/24, 203.0.113.0/24), internal RFC1918 addresses, and fake sha256 hashes. No real credentials, logs or systems.",
+  "analysts": [
+    { "handle": "j.okafor", "display_name": "Jordan Okafor" },
+    { "handle": "demo.analyst", "display_name": "Demo Analyst" }
+  ],
+  "alerts": [
+    {
+      "alert_id": "ALR-2026-10-0011",
+      "title": "Suspicious sign-in: ana.rios from unrecognised external IP",
+      "description": "Identity provider flagged a successful sign-in for ana.rios from an external IP never seen for this account, followed by an encoded PowerShell launch on the user's workstation.",
+      "severity": "high",
+      "alert_type": "suspicious_login",
+      "timestamp": "2026-10-12T09:14:00Z",
+      "source": "idp-anomaly",
+      "account": "ana.rios",
+      "device": "FIN-WS-1042",
+      "source_ip": "203.0.113.44",
+      "tags": ["impossible_travelabsent", "new_device", "finance"]
+    },
+    {
+      "alert_id": "ALR-2026-10-0012",
+      "title": "C2 beacon candidates: payments server contacting foreign IP",
+      "description": "Network monitoring observed the payments API host repeatedly contacting 198.51.100.77 on tcp/443 with beacon-like periodicity shortly after the host received an inbound connection from a finance workstation.",
+      "severity": "critical",
+      "alert_type": "c2_beacon",
+      "timestamp": "2026-10-12T09:43:00Z",
+      "source": "netflow-anomaly",
+      "device": "SRV-PAYMENTS-01",
+      "source_ip": "198.51.100.77",
+      "service": "payments-api",
+      "process": {
+        "name": "node",
+        "command_line": "/srv/payments/bin/node server.js",
+        "sha256": "3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f80"
+      },
+      "tags": ["beacon", "payments", "egress"]
+    },
+    {
+      "alert_id": "ALR-2026-10-0013",
+      "title": "Malware detected on marketing laptop (XMR miner)",
+      "description": "EDR quarantined a cryptominer binary on a marketing workstation. The device egressed to the same external IP that appeared in unrelated alerts this week, but shares no internal entities with them.",
+      "severity": "high",
+      "alert_type": "malware_detected",
+      "timestamp": "2026-10-12T09:20:00Z",
+      "source": "edr",
+      "account": "m.torres",
+      "device": "MKT-WS-2207",
+      "source_ip": "203.0.113.44",
+      "process": {
+        "name": "updater_x.exe",
+        "command_line": "C:\\Users\\mtorres\\AppData\\Roaming\\updater_x.exe --silent",
+        "sha256": "d41d8cd98f00b204e9800998ecf8427eaabbccddeeff00112233445566778899"
+      },
+      "tags": ["malware", "marketing"]
+    }
+  ],
+  "accounts": [
+    {
+      "id": "acct:ana.rios",
+      "display_name": "Ana Rios",
+      "department": "Finance",
+      "role": "Senior Financial Analyst",
+      "mfa_enrolled": true
+    },
+    {
+      "id": "acct:m.torres",
+      "display_name": "Marco Torres",
+      "department": "Marketing",
+      "role": "Marketing Coordinator",
+      "mfa_enrolled": true
+    }
+  ],
+  "devices": [
+    {
+      "id": "dev:fin-ws-1042",
+      "hostname": "FIN-WS-1042",
+      "os": "Windows 11 23H2",
+      "device_type": "workstation",
+      "criticality": "normal"
+    },
+    {
+      "id": "dev:srv-payments-01",
+      "hostname": "SRV-PAYMENTS-01",
+      "os": "Ubuntu 22.04 LTS",
+      "device_type": "server",
+      "criticality": "high"
+    },
+    {
+      "id": "dev:mkt-ws-2207",
+      "hostname": "MKT-WS-2207",
+      "os": "macOS 14.5",
+      "device_type": "workstation",
+      "criticality": "normal"
+    }
+  ],
+  "account_devices": [
+    {
+      "account": "acct:ana.rios",
+      "device": "dev:fin-ws-1042",
+      "first_seen": "2025-02-01T09:00:00Z",
+      "last_seen": "2026-10-12T09:15:00Z",
+      "source": "identity_inventory"
+    },
+    {
+      "account": "acct:m.torres",
+      "device": "dev:mkt-ws-2207",
+      "first_seen": "2024-11-12T09:00:00Z",
+      "last_seen": "2026-10-12T08:55:00Z",
+      "source": "identity_inventory"
+    }
+  ],
+  "logins": [
+    {
+      "account": "acct:ana.rios",
+      "ip": "ip:10.8.0.24",
+      "ts": "2026-10-12T08:01:12Z",
+      "success": true,
+      "source": "vpn-gateway"
+    },
+    {
+      "account": "acct:ana.rios",
+      "ip": "ip:203.0.113.44",
+      "ts": "2026-10-12T09:12:31Z",
+      "success": true,
+      "source": "idp"
+    },
+    {
+      "account": "acct:ana.rios",
+      "ip": "ip:203.0.113.44",
+      "ts": "2026-10-12T09:12:58Z",
+      "success": false,
+      "source": "idp"
+    }
+  ],
+  "process_executions": [
+    {
+      "process": {
+        "name": "powershell.exe",
+        "command_line": "powershell.exe -NoP -W Hidden -Enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkA",
+        "sha256": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08"
+      },
+      "device": "dev:fin-ws-1042",
+      "ts": "2026-10-12T09:15:02Z"
+    },
+    {
+      "process": {
+        "name": "node",
+        "command_line": "/srv/payments/bin/node server.js",
+        "sha256": "3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f80"
+      },
+      "device": "dev:srv-payments-01",
+      "ts": "2026-10-12T09:41:10Z"
+    }
+  ],
+  "connections": [
+    {
+      "src_device": "dev:fin-ws-1042",
+      "dst_device": "dev:srv-payments-01",
+      "port": 8443,
+      "proto": "tcp",
+      "ts": "2026-10-12T09:28:47Z"
+    },
+    {
+      "src_device": "dev:srv-payments-01",
+      "dst_ip": "ip:198.51.100.77",
+      "port": 443,
+      "proto": "tcp",
+      "ts": "2026-10-12T09:41:44Z",
+      "process_sha256": "3c4e5f6a7b8c9d0e1f2a3b4c5d6e7f8091a2b3c4d5e6f708192a3b4c5d6e7f80"
+    }
+  ],
+  "services": [
+    {
+      "id": "svc:payments-api",
+      "name": "payments-api",
+      "host_device": "dev:srv-payments-01",
+      "depends_on": ["svc:redis-cache"]
+    },
+    {
+      "id": "svc:redis-cache",
+      "name": "redis-cache",
+      "host_device": "dev:srv-payments-01",
+      "depends_on": []
+    }
+  ],
+  "historical_incidents": [
+    {
+      "id": "INC-2025-0417",
+      "title": "Ransomware staging via finance workstation",
+      "summary": "Initial access via stolen finance credentials, lateral movement to the legacy payroll VM, ransomware staging detected before encryption.",
+      "severity": "critical",
+      "opened_at": "2026-04-03T10:22:00Z",
+      "closed_at": "2026-04-05T16:40:00Z",
+      "alert_ids": ["ALR-2026-04-0091"],
+      "entity_ids": ["acct:ana.rios", "dev:fin-ws-1042"],
+      "analyst": "j.okafor",
+      "memories": [
+        {
+          "id": "mem:inc-0417-finding",
+          "kind": "finding",
+          "content": "FIN-WS-1042 was the initial access vector; the attacker moved laterally to the legacy payroll VM over RDP within 25 minutes of the anomalous sign-in. ana.rios had an MFA exemption that was never removed after a helpdesk ticket in 2025.",
+          "confidence": 0.75,
+          "created_by": "j.okafor"
+        },
+        {
+          "id": "mem:inc-0417-feedback",
+          "kind": "feedback",
+          "content": "Isolating the workstation within 20 minutes limited blast radius. For similar anomalous-login plus lateral-movement patterns, propose device isolation first and account review second.",
+          "confidence": 0.9,
+          "created_by": "j.okafor"
+        }
+      ]
+    },
+    {
+      "id": "INC-2025-0512",
+      "title": "Phishing-driven credential harvesting in marketing",
+      "summary": "Spear-phishing wave targeting marketing; one workstation compromised with an info-stealer. No lateral movement observed.",
+      "severity": "medium",
+      "opened_at": "2026-06-18T13:05:00Z",
+      "closed_at": "2026-06-19T09:15:00Z",
+      "alert_ids": ["ALR-2026-06-0177"],
+      "entity_ids": ["acct:m.torres", "dev:mkt-ws-2207"],
+      "analyst": "j.okafor",
+      "memories": [
+        {
+          "id": "mem:inc-0512-finding",
+          "kind": "finding",
+          "content": "Info-stealer on MKT-WS-2207 exfiltrated browser cookies; no evidence of lateral movement. Reimaged endpoint and rotated sessions.",
+          "confidence": 0.8,
+          "created_by": "j.okafor"
+        }
+      ]
+    }
+  ]
+}

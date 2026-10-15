@@ -1,0 +1,18 @@
+services:
+  falkordb:
+    image: falkordb/falkordb:latest
+    container_name: sentinelgraph-falkordb
+    ports:
+      - "6379:6379"   # Redis/FalkorDB protocol (Python client)
+      - "7379:7379"   # HTTP query endpoint
+    volumes:
+      - falkordb_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  falkordb_data:

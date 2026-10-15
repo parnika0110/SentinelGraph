@@ -18,11 +18,14 @@ Exit code 0 only when every check passes.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import urllib.error
 import urllib.request
 
-BASE = "http://127.0.0.1:8000"
+# Target API base: defaults to local dev; set SENTINELGRAPH_API for a
+# deployed instance (used by the production verification runs).
+BASE = os.environ.get("SENTINELGRAPH_API", "http://127.0.0.1:8000").rstrip("/")
 ALERT_A = "ALR-2026-10-0011"
 ALERT_B = "ALR-2026-10-0012"
 ALERT_C = "ALR-2026-10-0013"

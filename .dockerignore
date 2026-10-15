@@ -1,0 +1,13 @@
+.git
+.venv
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/node_modules
+**/.next
+*.log
+.env
+.env.local
+backend/uvicorn.log
+frontend/next-start.log
+frontend/next-dev.log

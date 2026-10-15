@@ -88,6 +88,7 @@ The frontend calls the backend at `NEXT_PUBLIC_API_URL`
 
 ```bash
 cd backend && python -m pytest tests/ -q     # 33 tests, live FalkorDB
+cd frontend && npm test                      # 12 vitest tests (client + UI)
 cd frontend && npm run lint && npm run build
 python -m scripts.demo_e2e                   # from backend/ — full API demo
 ```

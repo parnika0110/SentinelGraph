@@ -43,10 +43,18 @@ both runs green. Coverage:
 
 ```bash
 cd frontend
+npm test           # vitest (jsdom) -> 12 passed (2 files)
 npm run lint        # eslint -> 0 errors, 0 warnings
 npx tsc --noEmit    # clean
 npm run build       # Next.js 16.4.1 compiled successfully, "/" static route
 ```
+
+Frontend test coverage: API-client error mapping (HTTP detail -> `ApiError`,
+network failure -> status 0 with backend URL), request shapes
+(`POST /investigations`, approve/reject bodies, neighborhood hop URL), queue
+row rendering/selection, empty/error states, and the action panel's approval
+gate (approve/reject controls appear only for `PROPOSED`, simulated-badge
+present, empty state without an incident).
 
 Production server started with `npm run start -- --port 3000` and verified in
 a real browser.

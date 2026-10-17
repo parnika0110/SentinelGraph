@@ -5,7 +5,7 @@
 **Tracks entered:** *Agents That Act on Connected Data* (primary),
 *Agent Memory and Coordination* (secondary)
 
-> Repository URL: _\<to be filled after the public repo is created\>_
+> Repository URL: https://github.com/parnika0110/SentinelGraph (public)
 > Demo video: _\<to be filled after recording\>_ (follow [DEMO_SCRIPT.md](DEMO_SCRIPT.md))
 
 ---
@@ -59,7 +59,10 @@ hardcoded results.
 ranges, dummy hashes — no real credentials/logs); all response actions are
 simulated; README documents setup, the full graph data model and the
 verbatim Cypher the product depends on; complete local setup instructions
-are provided (no live deployment). Built with an AI coding assistant
+are provided. The project is also deployed live — frontend:
+https://frontend-production-717c.up.railway.app, API:
+https://backend-production-f51e.up.railway.app (FalkorDB on a persistent
+volume). Built with an AI coding assistant
 (Codebuff) in accordance with the event's AI policy — to be disclosed on the
 submission form.
 

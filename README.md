@@ -95,6 +95,27 @@ python -m scripts.demo_e2e                   # from backend/ — full API demo
 
 ---
 
+## Live demo
+
+| Service | URL |
+|---|---|
+| Frontend | https://frontend-production-717c.up.railway.app |
+| Backend API | https://backend-production-f51e.up.railway.app |
+| FalkorDB | private service (volume-backed, not exposed publicly) |
+
+Hosted on Railway: three services in one project — FalkorDB (Docker image +
+500 MB persistent volume mounted at `/data`), the FastAPI backend, and the
+Next.js frontend. All services build from the Dockerfiles in this repository
+(`backend/Dockerfile`, `frontend/Dockerfile`).
+
+Infrastructure is defined as code in `.railway/railway.ts` (services, builder,
+volume). Variable names (values are set in Railway, never committed):
+`FALKORDB_HOST`, `FALKORDB_PORT`, `CORS_ORIGINS`, `NEXT_PUBLIC_API_URL`,
+`AUTO_SEED_ON_STARTUP`. Backend and FalkorDB talk over Railway's private
+network; only the frontend and backend have public domains.
+
+---
+
 ## Architecture
 
 ```

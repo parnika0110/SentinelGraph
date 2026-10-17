@@ -74,8 +74,11 @@ stored findings, and the trust note *"Treat as an unverified lead, not
 confirmed truth."* Then the **Timeline** tab: chronological events built
 only from retrieved timestamps.
 
-Refresh the page and re-open the flow — the incident, evidence and actions
-are reconstructed from FalkorDB, not server memory.
+Re-run the investigation on the same alert — it merges into the same
+incident with the evidence and actions already stored in the graph,
+reconstructed from FalkorDB, not server memory. (API equivalent:
+`GET /investigations/{id}` returns the full stored result even after a
+backend restart.)
 
 ## 2:30–2:55 — Acting, with an approval gate
 

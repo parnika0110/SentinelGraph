@@ -120,3 +120,21 @@ describe("ActionPanel approval gate", () => {
     expect(screen.getByText("No incident yet")).toBeTruthy();
   });
 });
+
+describe("ActionPanel two-step confirmation", () => {
+  it("requires an explicit confirm and can be cancelled", () => {
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({})]}
+        onActionsChanged={() => {}}
+        analyst="demo.analyst"
+      />,
+    );
+    fireEvent.click(screen.getByText("approve"));
+    expect(screen.getByText(/approve this simulated action\?/)).toBeTruthy();
+    expect(screen.getByText("confirm approve")).toBeTruthy();
+    fireEvent.click(screen.getByText("cancel"));
+    expect(screen.getByText("approve")).toBeTruthy();
+  });
+});

@@ -31,7 +31,7 @@ function EntityNode({ data }: NodeProps<Node<EntityNodeData>>) {
   const style = LABEL_STYLES[data.entityLabel] ?? "bg-slate-500/15 text-slate-300 border-slate-500/40";
   return (
     <div
-      className={`rounded-md border px-2.5 py-1.5 text-left ${
+      className={`rounded-sm border px-2.5 py-1.5 text-left ${
         style
       } ${data.isCenter ? "ring-2 ring-sky-400/80" : ""} min-w-[130px] max-w-[190px] bg-slate-950/80 backdrop-blur`}
       title={`${data.entityLabel}: ${data.entityId}`}
@@ -132,10 +132,10 @@ function layout(nb: NeighborhoodResponse) {
       target: e.dst,
       label: ts ? `${e.type} · ${ts.slice(11, 16)}` : e.type,
       animated: activity,
-      labelBgStyle: { fill: "#0f172a" },
-      labelStyle: { fill: "#94a3b8", fontSize: 9 },
-      style: { stroke: activity ? "#38bdf8" : "#475569", strokeDasharray: activity ? undefined : "4 3" },
-      markerEnd: { type: MarkerType.ArrowClosed, width: 12, height: 12, color: activity ? "#38bdf8" : "#475569" },
+      labelBgStyle: { fill: "#181a17" },
+      labelStyle: { fill: "#9a9c91", fontSize: 9 },
+      style: { stroke: activity ? "#c5f36b" : "#5a5c54", strokeDasharray: activity ? undefined : "4 3" },
+      markerEnd: { type: MarkerType.ArrowClosed, width: 12, height: 12, color: activity ? "#c5f36b" : "#5a5c54" },
     };
   });
 
@@ -188,7 +188,7 @@ export default function GraphExplorer({
           solid blue = observed activity · dashed = inventory
         </span>
       </div>
-      <div className="h-full min-h-[340px] flex-1 rounded-md border border-white/10 bg-slate-950/60">
+      <div className="h-full min-h-[340px] flex-1 rounded-sm border border-white/10 bg-slate-950/60">
         <ReactFlow
           nodes={flowNodes}
           edges={flowEdges}
@@ -202,7 +202,7 @@ export default function GraphExplorer({
           onNodeClick={(_, node) => onNodeClick?.(node.id)}
           proOptions={{ hideAttribution: true }}
         >
-          <Background gap={18} color="#1e293b" />
+          <Background gap={18} color="#30332d" />
           <Controls showInteractive={false} />
           <MiniMap
             pannable
@@ -210,14 +210,14 @@ export default function GraphExplorer({
             nodeColor={(n) => {
               const l = (n.data as EntityNodeData).entityLabel;
               return l === "Alert"
-                ? "#f43f5e"
+                ? "#e0674f"
                 : l === "Device"
-                  ? "#8b5cf6"
+                  ? "#b0a285"
                   : l === "Account"
-                    ? "#0ea5e9"
+                    ? "#c5f36b"
                     : l === "IPAddress"
-                      ? "#f59e0b"
-                      : "#64748b";
+                      ? "#d9a441"
+                      : "#7a7c72";
             }}
             maskColor="rgba(2,6,23,0.7)"
           />

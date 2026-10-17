@@ -32,7 +32,7 @@ import type { AlertSummary, EvidenceItem, InvestigationResult } from "@/lib/api"
 function HypothesisCard({ h }: { h: InvestigationResult["hypotheses"][number] }) {
   const pct = Math.round(h.confidence * 100);
   return (
-    <div className="rounded-md border border-white/10 bg-slate-950/50 p-3">
+    <div className="rounded-sm border border-white/10 bg-slate-950/50 p-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           <Lightbulb className="h-4 w-4 text-amber-400" />
@@ -106,7 +106,7 @@ function EvidencePathView({ ev }: { ev: EvidenceItem }) {
   if (!ev.path) return null;
   const { nodes, edges } = ev.path;
   return (
-    <div className="rounded-md border border-white/10 bg-slate-950/50 p-3">
+    <div className="rounded-sm border border-white/10 bg-slate-950/50 p-3">
       <div className="mb-2 flex flex-wrap items-center gap-1.5">
         <Badge className="border-cyan-500/40 bg-cyan-500/10 text-cyan-300">
           {nodes.length - 1} hops
@@ -279,7 +279,7 @@ export default function InvestigationView({
             {result.historical_context.map((h) => (
               <div
                 key={h.similar_incident_id}
-                className="rounded-md border border-white/10 bg-slate-950/50 p-2.5"
+                className="rounded-sm border border-white/10 bg-slate-950/50 p-2.5"
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex items-center gap-2">

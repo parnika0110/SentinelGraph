@@ -37,11 +37,15 @@ export function ActionPanel({
 }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Two-step decision: first click arms, second click submits.
+  const [pending, setPending] = useState<{ id: string; decision: "approve" | "reject" } | null>(null);
 
   const decide = useCallback(
     async (id: string, decision: "approve" | "reject") => {
+      if (busyId) return; // block double submission
       setBusyId(id);
       setError(null);
+      setPending(null);
       try {
         await api.decide(id, decision, analyst, `${decision} via SentinelGraph dashboard`);
         const refreshed = await api.actions(incidentId!);
@@ -52,7 +56,7 @@ export function ActionPanel({
         setBusyId(null);
       }
     },
-    [analyst, incidentId, onActionsChanged],
+    [analyst, busyId, incidentId, onActionsChanged],
   );
 
   if (!incidentId)
@@ -83,7 +87,7 @@ export function ActionPanel({
         {actions.map((a) => (
           <div
             key={a.id}
-            className="rounded-md border border-white/10 bg-slate-950/50 p-2.5"
+            className="rounded-sm border border-white/10 bg-slate-950/50 p-2.5"
           >
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -103,23 +107,41 @@ export function ActionPanel({
                 proposed {a.created_at} by {a.created_by}
                 {a.decided_by && ` · decided by ${a.decided_by}`}
               </span>
-              {a.status === "PROPOSED" && (
+              {a.status === "PROPOSED" && pending?.id === a.id && (
+                <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={`Confirm ${pending.decision}`}>
+                  <span className="text-[10px] text-slate-400">
+                    {pending.decision} this simulated action?
+                  </span>
+                  <button
+                    onClick={() => decide(a.id, pending.decision)}
+                    disabled={busyId !== null}
+                    className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide disabled:opacity-50 ${pending.decision === "approve" ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300" : "border-rose-500/50 bg-rose-500/20 text-rose-300"}`}
+                  >
+                    {busyId === a.id && <Loader2 className="h-3 w-3 animate-spin" />}
+                    confirm {pending.decision}
+                  </button>
+                  <button
+                    onClick={() => setPending(null)}
+                    disabled={busyId !== null}
+                    className="rounded border border-[var(--border)] px-2 py-1 text-[10px] uppercase tracking-wide text-slate-400 hover:bg-white/5"
+                  >
+                    cancel
+                  </button>
+                </div>
+              )}
+              {a.status === "PROPOSED" && pending?.id !== a.id && (
                 <div className="flex gap-1.5">
                   <button
-                    onClick={() => decide(a.id, "approve")}
-                    disabled={busyId === a.id}
+                    onClick={() => setPending({ id: a.id, decision: "approve" })}
+                    disabled={busyId !== null}
                     className="inline-flex items-center gap-1 rounded border border-emerald-500/50 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-50"
                   >
-                    {busyId === a.id ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <CheckCircle2 className="h-3 w-3" />
-                    )}
+                    <CheckCircle2 className="h-3 w-3" />
                     approve
                   </button>
                   <button
-                    onClick={() => decide(a.id, "reject")}
-                    disabled={busyId === a.id}
+                    onClick={() => setPending({ id: a.id, decision: "reject" })}
+                    disabled={busyId !== null}
                     className="inline-flex items-center gap-1 rounded border border-rose-500/50 bg-rose-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-rose-300 hover:bg-rose-500/20 disabled:opacity-50"
                   >
                     <XCircle className="h-3 w-3" />

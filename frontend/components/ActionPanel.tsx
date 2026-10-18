@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import {
   CheckCircle2,
   ClipboardCheck,
@@ -17,7 +17,7 @@ const STATUS_STYLES: Record<string, string> = {
   PROPOSED: "border-amber-500/40 bg-amber-500/10 text-amber-300",
   APPROVED: "border-emerald-500/40 bg-emerald-500/10 text-emerald-300",
   REJECTED: "border-rose-500/40 bg-rose-500/10 text-rose-300",
-  COMPLETED: "border-sky-500/40 bg-sky-500/10 text-sky-300",
+  COMPLETED: "border-zinc-500/40 bg-zinc-500/10 text-zinc-300",
 };
 
 // ---------------------------------------------------------------------------
@@ -37,20 +37,29 @@ export function ActionPanel({
 }) {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  // Two-step decision: first click arms, second click submits.
-  const [pending, setPending] = useState<{ id: string; decision: "approve" | "reject" } | null>(null);
+  // Two-step decision: first click stages the decision, second click submits it.
+  // The stage records which incident it belongs to so it never leaks across
+  // incidents, and it is only cleared on success (or explicit cancel) so an
+  // API error cannot silently discard the analyst's intent.
+  const [pending, setPending] = useState<{
+    incident: string;
+    id: string;
+    decision: "approve" | "reject";
+  } | null>(null);
+  const stageButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
   const decide = useCallback(
     async (id: string, decision: "approve" | "reject") => {
       if (busyId) return; // block double submission
       setBusyId(id);
       setError(null);
-      setPending(null);
       try {
         await api.decide(id, decision, analyst, `${decision} via SentinelGraph dashboard`);
         const refreshed = await api.actions(incidentId!);
         onActionsChanged(refreshed.actions);
+        setPending(null); // clear only after a successful submit
       } catch (err) {
+        // Keep the staged decision visible so it is not lost; the analyst can retry.
         setError((err as Error).message);
       } finally {
         setBusyId(null);
@@ -58,6 +67,19 @@ export function ActionPanel({
     },
     [analyst, busyId, incidentId, onActionsChanged],
   );
+
+  const stage = useCallback((id: string, decision: "approve" | "reject") => {
+    setPending({ incident: incidentId ?? "", id, decision });
+  }, [incidentId]);
+
+  const cancelStaged = useCallback(() => {
+    if (!pending) return;
+    const key = `${pending.id}:${pending.decision}`;
+    setPending(null);
+    // Return keyboard focus to the button that started the staged decision
+    // once it re-mounts.
+    window.setTimeout(() => stageButtonRefs.current[key]?.focus(), 0);
+  }, [pending]);
 
   if (!incidentId)
     return (
@@ -77,9 +99,12 @@ export function ActionPanel({
         <Badge className="border-amber-500/40 bg-amber-500/10 text-amber-300">
           approval required
         </Badge>
-      }
-    >
-      {error && <div className="mb-2"><ErrorState message={error} /></div>}
+      }      >
+      {error && (
+        <div role="alert" className="mt-2">
+          <ErrorState message={error} />
+        </div>
+      )}
       {actions.length === 0 && (
         <p className="text-xs text-slate-500">No proposals for this incident.</p>
       )}
@@ -107,12 +132,16 @@ export function ActionPanel({
                 proposed {a.created_at} by {a.created_by}
                 {a.decided_by && ` · decided by ${a.decided_by}`}
               </span>
-              {a.status === "PROPOSED" && pending?.id === a.id && (
-                <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={`Confirm ${pending.decision}`}>
+              {a.status === "PROPOSED" &&
+                pending &&
+                pending.id === a.id &&
+                pending.incident === incidentId && (
+                <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={`Confirm ${pending.decision} for ${a.action_type}`}>
                   <span className="text-[10px] text-slate-400">
-                    {pending.decision} this simulated action?
+                    {pending.decision} this simulated action? ({a.action_type} → {a.target_id})
                   </span>
                   <button
+                    autoFocus
                     onClick={() => decide(a.id, pending.decision)}
                     disabled={busyId !== null}
                     className={`inline-flex items-center gap-1 rounded border px-2 py-1 text-[10px] font-semibold uppercase tracking-wide disabled:opacity-50 ${pending.decision === "approve" ? "border-emerald-500/50 bg-emerald-500/20 text-emerald-300" : "border-rose-500/50 bg-rose-500/20 text-rose-300"}`}
@@ -121,7 +150,7 @@ export function ActionPanel({
                     confirm {pending.decision}
                   </button>
                   <button
-                    onClick={() => setPending(null)}
+                    onClick={cancelStaged}
                     disabled={busyId !== null}
                     className="rounded border border-[var(--border)] px-2 py-1 text-[10px] uppercase tracking-wide text-slate-400 hover:bg-white/5"
                   >
@@ -129,10 +158,14 @@ export function ActionPanel({
                   </button>
                 </div>
               )}
-              {a.status === "PROPOSED" && pending?.id !== a.id && (
+              {a.status === "PROPOSED" &&
+                !(pending && pending.id === a.id && pending.incident === incidentId) && (
                 <div className="flex gap-1.5">
                   <button
-                    onClick={() => setPending({ id: a.id, decision: "approve" })}
+                    ref={(el) => {
+                      stageButtonRefs.current[`${a.id}:approve`] = el;
+                    }}
+                    onClick={() => stage(a.id, "approve")}
                     disabled={busyId !== null}
                     className="inline-flex items-center gap-1 rounded border border-emerald-500/50 bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-50"
                   >
@@ -140,7 +173,10 @@ export function ActionPanel({
                     approve
                   </button>
                   <button
-                    onClick={() => setPending({ id: a.id, decision: "reject" })}
+                    ref={(el) => {
+                      stageButtonRefs.current[`${a.id}:reject`] = el;
+                    }}
+                    onClick={() => stage(a.id, "reject")}
                     disabled={busyId !== null}
                     className="inline-flex items-center gap-1 rounded border border-rose-500/50 bg-rose-500/10 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-rose-300 hover:bg-rose-500/20 disabled:opacity-50"
                   >
@@ -242,7 +278,7 @@ export function MemoryPanel({
                   <Badge
                     className={
                       m.kind === "finding"
-                        ? "border-sky-500/40 bg-sky-500/10 text-sky-300"
+                        ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
                         : "border-violet-500/40 bg-violet-500/10 text-violet-300"
                     }
                   >
@@ -275,7 +311,7 @@ export function MemoryPanel({
               onChange={(e) => setText(e.target.value)}
               rows={2}
               placeholder="Record analyst feedback for future investigations..."
-              className="flex-1 resize-none rounded border border-white/10 bg-slate-950/60 px-2 py-1.5 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-sky-500/50 focus:outline-none"
+              className="flex-1 resize-none rounded border border-white/10 bg-slate-950/60 px-2 py-1.5 text-[11px] text-slate-200 placeholder:text-slate-600 focus:border-[var(--accent)]"
             />
             <button
               onClick={submit}

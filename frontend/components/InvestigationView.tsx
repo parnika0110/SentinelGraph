@@ -418,10 +418,10 @@ export default function InvestigationView({
             )}
             {result.timeline.map((e, i) => (
               <div key={i} className="relative">
-                <span className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full border border-slate-900 bg-sky-400" />
+                <span className="absolute -left-[21px] top-1.5 h-2 w-2 rounded-full border border-slate-900 bg-slate-500" />
                 <div className="flex items-center gap-2">
                   <Clock className="h-3 w-3 text-slate-500" />
-                  <span className="font-mono text-[10px] text-sky-400">{e.ts}</span>
+                  <span className="font-mono text-[10px] text-slate-400">{e.ts}</span>
                   <Badge className="border-slate-500/40 bg-slate-500/10 text-slate-400">
                     {e.kind}
                   </Badge>

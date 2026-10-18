@@ -33,7 +33,7 @@ function EntityNode({ data }: NodeProps<Node<EntityNodeData>>) {
     <div
       className={`rounded-sm border px-2.5 py-1.5 text-left ${
         style
-      } ${data.isCenter ? "ring-2 ring-sky-400/80" : ""} min-w-[130px] max-w-[190px] bg-slate-950/80 backdrop-blur`}
+      } ${data.isCenter ? "ring-2 ring-sky-400/80" : ""} min-w-[130px] max-w-[190px] bg-slate-950/90`}
       title={`${data.entityLabel}: ${data.entityId}`}
     >
       <Handle type="target" position={Position.Left} className="!bg-slate-500" />
@@ -175,17 +175,17 @@ export default function GraphExplorer({
   return (
     <div className="flex h-full flex-col">
       <div className="mb-2 flex flex-wrap items-center gap-1.5">
-        <Badge className="border-sky-500/40 bg-sky-500/10 text-sky-300">
+        <Badge className="border-slate-500/40 bg-slate-500/10 text-slate-400">
           {data.nodes.length} nodes
         </Badge>
         <Badge className="border-slate-500/40 bg-slate-500/10 text-slate-400">
           {data.edges.length} rels
         </Badge>
-        <Badge className="border-cyan-500/40 bg-cyan-500/10 text-cyan-300">
+        <Badge className="border-sky-500/40 bg-sky-500/10 text-sky-300">
           {activityCount} activity
         </Badge>
         <span className="text-[10px] text-slate-500">
-          solid blue = observed activity · dashed = inventory
+          solid lime = observed activity · dashed = inventory
         </span>
       </div>
       <div className="h-full min-h-[340px] flex-1 rounded-sm border border-white/10 bg-slate-950/60">
@@ -214,12 +214,12 @@ export default function GraphExplorer({
                 : l === "Device"
                   ? "#b0a285"
                   : l === "Account"
-                    ? "#c5f36b"
+                    ? "#8fae9a"
                     : l === "IPAddress"
                       ? "#d9a441"
                       : "#7a7c72";
             }}
-            maskColor="rgba(2,6,23,0.7)"
+            maskColor="rgba(16,17,15,0.7)"
           />
         </ReactFlow>
       </div>

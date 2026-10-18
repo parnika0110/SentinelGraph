@@ -19,10 +19,10 @@ export function Mark() {
   );
 }
 
-/** Slim left rail (lg+). Items are in-page anchors: the workspace is one screen. */
+/** Slim left rail (all screen sizes). Items are in-page anchors to the workspace panels. */
 export default function Rail() {
   return (
-    <nav aria-label="Workspace" className="hidden w-14 shrink-0 flex-col items-center gap-1 border-r border-[var(--border)] bg-[var(--bg)] py-3 lg:flex">
+    <nav aria-label="Workspace" className="flex w-14 shrink-0 flex-col items-center gap-1 border-r border-[var(--border)] bg-[var(--bg)] py-3">
       <Link href="/" aria-label="SentinelGraph home" title="Home" className="mb-3 flex h-9 w-9 items-center justify-center hover:bg-[var(--surface)]">
         <Mark />
       </Link>

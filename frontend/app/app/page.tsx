@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity,
@@ -10,7 +9,7 @@ import {
   RefreshCw,
   Search,
 } from "lucide-react";
-import Rail, { Mark } from "@/components/app/Rail";
+import Rail from "@/components/app/Rail";
 import GraphExplorer from "@/components/GraphExplorer";
 import InvestigationView from "@/components/InvestigationView";
 import { ActionPanel, MemoryPanel } from "@/components/ActionPanel";
@@ -212,7 +211,6 @@ export default function Dashboard() {
       {/* ---------------- header ---------------- */}
       <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[var(--border)] bg-[var(--bg)] px-4 py-2.5">
         <div className="flex items-center gap-3">
-          <Link href="/" className="lg:hidden" aria-label="SentinelGraph home"><Mark /></Link>
           <div>
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-slate-500">Workspace / Investigations</p>
             <h1 className="font-serif text-xl leading-tight tracking-tight text-slate-100">Investigation workspace</h1>
@@ -226,7 +224,7 @@ export default function Dashboard() {
               <Activity className="h-3 w-3" /> backend offline
             </span>
           ) : health ? (
-            <span role="status" title={`${health.falkordb} · ${health.graph}`} className={`inline-flex items-center gap-1.5 border px-2 py-1 text-[10px] font-medium ${["ok", "healthy"].includes(health.status.toLowerCase()) ? "border-sky-500/40 bg-sky-500/10 text-sky-300" : "border-amber-500/40 bg-amber-500/10 text-amber-300"}`}>
+            <span role="status" title={`${health.falkordb} · ${health.graph}`} className={`inline-flex items-center gap-1.5 border px-2 py-1 text-[10px] font-medium ${["ok", "healthy"].includes(health.status.toLowerCase()) ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300" : "border-amber-500/40 bg-amber-500/10 text-amber-300"}`}>
               <Activity className="h-3 w-3" />
               {["ok", "healthy"].includes(health.status.toLowerCase()) ? "" : "degraded: "}{health.status} · {health.falkordb} · {health.graph}
             </span>
@@ -236,7 +234,7 @@ export default function Dashboard() {
 
           <label className="flex items-center gap-1.5 text-[10px] text-slate-500">
             analyst
-            <input value={analyst} onChange={(e) => setAnalyst(e.target.value)} className="w-28 border border-[var(--border)] bg-slate-950/60 px-2 py-1 font-mono text-[11px] text-slate-300 focus:border-sky-500/50 focus:outline-none" />
+            <input value={analyst} onChange={(e) => setAnalyst(e.target.value)} className="w-28 border border-[var(--border)] bg-slate-950/60 px-2 py-1 font-mono text-[11px] text-slate-300 focus:border-[var(--accent)]" />
           </label>
 
           <button
@@ -249,9 +247,9 @@ export default function Dashboard() {
       </header>
 
       {/* ---------------- main grid ---------------- */}
-      <main className="grid flex-1 grid-cols-1 gap-3 p-3 lg:overflow-hidden lg:grid-cols-[280px_1fr] xl:grid-cols-[280px_1fr_400px]">
+      <main className="grid flex-1 grid-cols-1 gap-3 p-3 lg:grid-cols-[280px_1fr] lg:grid-rows-[minmax(0,1fr)_minmax(0,1fr)] xl:grid-cols-[280px_1fr_400px] xl:grid-rows-[minmax(0,1fr)] lg:overflow-hidden">
         {/* ------- left: incident queue ------- */}
-        <aside id="queue" className="flex max-h-[70vh] min-h-0 scroll-mt-3 flex-col border border-[var(--border)] bg-slate-900 lg:max-h-none">
+        <aside id="queue" className="flex max-h-[70vh] min-h-0 scroll-mt-3 flex-col border border-[var(--border)] bg-slate-900 lg:max-h-none lg:row-span-2 xl:row-span-1">
           <header className="border-b border-white/10 px-3 py-2">
             <div className="flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
@@ -269,7 +267,7 @@ export default function Dashboard() {
                 value={queueSearch}
                 onChange={(e) => setQueueSearch(e.target.value)}
                 placeholder="search alerts…"
-                className="w-full bg-transparent text-[11px] text-slate-300 placeholder:text-slate-600 focus:outline-none"
+                className="w-full bg-transparent text-[11px] text-slate-300 placeholder:text-slate-600"
               />
             </div>
 
@@ -353,7 +351,7 @@ export default function Dashboard() {
         </aside>
 
         {/* ------- center: investigation detail ------- */}
-        <section id="investigation" className="min-h-0 scroll-mt-3 overflow-y-auto pr-1">
+        <section id="investigation" className="min-h-0 scroll-mt-3 overflow-y-auto pr-1 xl:col-start-2 xl:row-start-1">
           <InvestigationView
             result={investigation}
             loading={invLoading}
@@ -365,7 +363,7 @@ export default function Dashboard() {
         </section>
 
         {/* ------- right: graph + actions + memory ------- */}
-        <aside className="flex min-h-0 flex-col gap-3 overflow-y-auto lg:col-span-2 xl:col-span-1">
+        <aside className="flex min-h-0 flex-col gap-3 overflow-y-auto xl:col-start-3 xl:row-start-1">
           <section id="graph" className="scroll-mt-3 border border-[var(--border)] bg-slate-900 p-3">
             <div className="mb-2 flex items-center justify-between">
               <h2 className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">

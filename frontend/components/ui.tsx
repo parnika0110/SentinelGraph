@@ -10,12 +10,12 @@ export const SEVERITY_STYLES: Record<string, string> = {
   critical: "bg-rose-500/15 text-rose-300 border-rose-500/40",
   high: "bg-orange-500/15 text-orange-300 border-orange-500/40",
   medium: "bg-amber-500/15 text-amber-300 border-amber-500/40",
-  low: "bg-sky-500/15 text-sky-300 border-sky-500/40",
+  low: "bg-teal-500/15 text-teal-300 border-teal-500/40",
 };
 
 export const LABEL_STYLES: Record<string, string> = {
   Alert: "bg-rose-500/15 text-rose-300 border-rose-500/40",
-  Account: "bg-sky-500/15 text-sky-300 border-sky-500/40",
+  Account: "bg-emerald-500/15 text-emerald-300 border-emerald-500/40",
   Device: "bg-violet-500/15 text-violet-300 border-violet-500/40",
   IPAddress: "bg-amber-500/15 text-amber-300 border-amber-500/40",
   Process: "bg-teal-500/15 text-teal-300 border-teal-500/40",

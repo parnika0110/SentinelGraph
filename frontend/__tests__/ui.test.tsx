@@ -2,11 +2,25 @@
  * UI component tests: queue row, states, and the approval-gated action panel.
  */
 
-import { describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { EmptyState, ErrorState, QueueRow } from "@/components/ui";
 import { ActionPanel } from "@/components/ActionPanel";
-import type { ActionOut, AlertSummary } from "@/lib/api";
+import { api, type ActionOut, type AlertSummary } from "@/lib/api";
+
+// Mock the two API methods the action panel calls, keeping the rest real.
+vi.mock("@/lib/api", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/api")>();
+  return {
+    ...actual,
+    api: { ...actual.api, decide: vi.fn(), actions: vi.fn() },
+  };
+});
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.mocked(api.actions).mockResolvedValue({ count: 0, actions: [] });
+});
 
 const alert: AlertSummary = {
   id: "ALR-2026-10-0011",
@@ -136,5 +150,164 @@ describe("ActionPanel two-step confirmation", () => {
     expect(screen.getByText("confirm approve")).toBeTruthy();
     fireEvent.click(screen.getByText("cancel"));
     expect(screen.getByText("approve")).toBeTruthy();
+    // A cancelled confirmation must never hit the API.
+    expect(api.decide).not.toHaveBeenCalled();
+  });
+
+  it("calls decide exactly once after confirming an approval", async () => {
+    const onActionsChanged = vi.fn();
+    const approved = makeAction({ id: "act:prop", status: "APPROVED" });
+    vi.mocked(api.decide).mockResolvedValue(approved);
+    vi.mocked(api.actions).mockResolvedValue({ count: 1, actions: [approved] });
+
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({ id: "act:prop", status: "PROPOSED" })]}
+        onActionsChanged={onActionsChanged}
+        analyst="demo.analyst"
+      />,
+    );
+    // First click only stages: no API call yet.
+    fireEvent.click(screen.getByText("approve"));
+    expect(api.decide).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByText("confirm approve"));
+    await waitFor(() => expect(api.decide).toHaveBeenCalledTimes(1));
+    expect(api.decide).toHaveBeenCalledWith(
+      "act:prop",
+      "approve",
+      "demo.analyst",
+      expect.stringContaining("approve"),
+    );
+    await waitFor(() => expect(api.actions).toHaveBeenCalledWith("INC-2026-TEST"));
+    await waitFor(() => expect(onActionsChanged).toHaveBeenCalledWith([approved]));
+    // Staged state is cleared after the successful submit.
+    expect(screen.queryByText("confirm approve")).toBeNull();
+  });
+
+  it("calls decide exactly once after confirming a rejection", async () => {
+    const onActionsChanged = vi.fn();
+    const rejected = makeAction({ id: "act:prop", status: "REJECTED" });
+    vi.mocked(api.decide).mockResolvedValue(rejected);
+    vi.mocked(api.actions).mockResolvedValue({ count: 1, actions: [rejected] });
+
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({ id: "act:prop", status: "PROPOSED" })]}
+        onActionsChanged={onActionsChanged}
+        analyst="demo.analyst"
+      />,
+    );
+    fireEvent.click(screen.getByText("reject"));
+    expect(api.decide).not.toHaveBeenCalled(); // staged, not submitted
+    fireEvent.click(screen.getByText("confirm reject"));
+    await waitFor(() => expect(api.decide).toHaveBeenCalledTimes(1));
+    expect(api.decide).toHaveBeenCalledWith(
+      "act:prop",
+      "reject",
+      "demo.analyst",
+      expect.stringContaining("reject"),
+    );
+    await waitFor(() => expect(onActionsChanged).toHaveBeenCalledWith([rejected]));
+    expect(screen.queryByText("confirm reject")).toBeNull();
+  });
+
+  it("keeps the staged decision visible when the API fails (no silent loss)", async () => {
+    vi.mocked(api.decide).mockRejectedValue(new Error("boom: backend 500"));
+
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({ id: "act:prop", status: "PROPOSED" })]}
+        onActionsChanged={() => {}}
+        analyst="demo.analyst"
+      />,
+    );
+    fireEvent.click(screen.getByText("approve"));
+    fireEvent.click(screen.getByText("confirm approve"));
+
+    // Error surfaced, decision still staged so the analyst can retry or cancel.
+    await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+    expect(screen.getByText(/boom: backend 500/)).toBeTruthy();
+    expect(screen.getByText("confirm approve")).toBeTruthy();
+    expect(api.decide).toHaveBeenCalledTimes(1);
+
+    // Retry works and is still a single call per confirm click.
+    fireEvent.click(screen.getByText("confirm approve"));
+    await waitFor(() => expect(api.decide).toHaveBeenCalledTimes(2));
+  });
+
+  it("does not call decide while a decision is in flight (no duplicate submit)", async () => {
+    let resolveDecide!: (v: ActionOut) => void;
+    vi.mocked(api.decide).mockImplementation(
+      () => new Promise((res) => { resolveDecide = res; }),
+    );
+    vi.mocked(api.actions).mockResolvedValue({
+      count: 1,
+      actions: [makeAction({ id: "act:prop", status: "APPROVED" })],
+    });
+
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({ id: "act:prop", status: "PROPOSED" })]}
+        onActionsChanged={() => {}}
+        analyst="demo.analyst"
+      />,
+    );
+    fireEvent.click(screen.getByText("approve"));
+    fireEvent.click(screen.getByText("confirm approve"));
+    await waitFor(() =>
+      expect(
+        (screen.getByRole("button", { name: /confirm approve/i }) as HTMLButtonElement)
+          .disabled,
+      ).toBe(true),
+    );
+    // Button is disabled while in flight: further clicks are no-ops.
+    fireEvent.click(screen.getByRole("button", { name: /confirm approve/i }));
+    expect(api.decide).toHaveBeenCalledTimes(1);
+    resolveDecide(makeAction({ id: "act:prop", status: "APPROVED" }));
+    await waitFor(() => expect(api.decide).toHaveBeenCalledTimes(1));
+  });
+
+  it("clears the staged decision when the selected incident changes", () => {
+    const props = {
+      actions: [makeAction({ id: "act:prop", status: "PROPOSED" as const })],
+      onActionsChanged: () => {},
+      analyst: "demo.analyst",
+    };
+    const { rerender } = render(<ActionPanel incidentId="INC-A" {...props} />);
+    fireEvent.click(screen.getByText("approve"));
+    expect(screen.getByText(/approve this simulated action\?/)).toBeTruthy();
+
+    rerender(<ActionPanel incidentId="INC-B" {...props} />);
+    expect(screen.queryByText("confirm approve")).toBeNull();
+    expect(screen.getByText("approve")).toBeTruthy();
+    expect(api.decide).not.toHaveBeenCalled();
+  });
+
+  it("moves focus to the confirm button when staging, and back on cancel", async () => {
+    render(
+      <ActionPanel
+        incidentId="INC-2026-TEST"
+        actions={[makeAction({ id: "act:prop", status: "PROPOSED" })]}
+        onActionsChanged={() => {}}
+        analyst="demo.analyst"
+      />,
+    );
+    const approveBtn = screen.getByRole("button", { name: /approve/i });
+    approveBtn.focus();
+    fireEvent.click(approveBtn);
+    await waitFor(() =>
+      expect(document.activeElement?.textContent).toContain("confirm approve"),
+    );
+
+    fireEvent.click(screen.getByText("cancel"));
+    await waitFor(() =>
+      expect(document.activeElement?.textContent).toContain("approve"),
+    );
+    expect(api.decide).not.toHaveBeenCalled();
   });
 });

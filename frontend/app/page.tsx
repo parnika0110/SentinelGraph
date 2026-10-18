@@ -40,7 +40,7 @@ const TRUST = [
 export default function Landing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--bg)]/90 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-[var(--border)] bg-[var(--bg)]/95">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5" aria-label="Primary">
           <Link href="/" aria-label="SentinelGraph home"><Logo /></Link>
           <div className="hidden items-center gap-7 text-sm text-[var(--text-2)] md:flex">

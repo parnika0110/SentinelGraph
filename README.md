@@ -77,18 +77,20 @@ The demo dataset is auto-seeded on startup when the graph is empty
 ```bash
 cd frontend
 npm install
-npm run dev                   # http://localhost:3000
+npm run dev                   # http://localhost:3000 (landing page)
 # production: npm run build && npm run start -- --port 3000
 ```
 
-The frontend calls the backend at `NEXT_PUBLIC_API_URL`
-(default `http://localhost:8000`; CORS allows `localhost:3000`).
+Open `http://localhost:3000` for the landing page; the investigation
+workspace is at `http://localhost:3000/app`. The frontend calls the backend
+at `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`; CORS allows
+`localhost:3000`).
 
 ### 4. Verify
 
 ```bash
 cd backend && python -m pytest tests/ -q     # 33 tests, live FalkorDB
-cd frontend && npm test                      # 12 vitest tests (client + UI)
+cd frontend && npm test                      # 19 vitest tests (client + UI)
 cd frontend && npm run lint && npm run build
 python -m scripts.demo_e2e                   # from backend/ — full API demo
 ```

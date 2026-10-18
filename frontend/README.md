@@ -8,13 +8,14 @@ historical-memory panel, and approval-gated response actions.
   [@xyflow/react](https://reactflow.dev) · lucide-react
 - **API client:** [lib/api.ts](lib/api.ts) (typed; every panel fetches from the
   backend — no hardcoded investigation results)
-- **Tests:** `npm test` (vitest + jsdom + Testing Library, 12 tests)
+- **Tests:** `npm test` (vitest + jsdom + Testing Library, 19 tests)
 
 ## Run
 
 ```bash
 npm install
 npm run dev                    # http://localhost:3000 (expects backend on :8000)
+# landing page at `/`; investigation workspace at `/app`
 # production:
 npm run build && npm run start -- --port 3000
 ```

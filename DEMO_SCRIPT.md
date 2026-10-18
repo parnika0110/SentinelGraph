@@ -1,9 +1,10 @@
 # SentinelGraph — 3-minute demo script
 
-Record the browser at 1080p with the dashboard on `http://localhost:3000`
-(production build) and, optionally, a terminal window beside it. Every step
-below corresponds to behaviour that was verified on the running system —
-quoted values are from those verified runs.
+Record the browser at 1080p with the investigation workspace on
+`http://localhost:3000/app` (production build) and, optionally, a terminal
+window beside it. (The landing page is served at `/`; the workspace is at
+`/app`.) Every step below corresponds to behaviour that was verified on the
+running system — quoted values are from those verified runs.
 
 ## Prep (before recording)
 

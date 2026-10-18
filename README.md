@@ -308,6 +308,15 @@ See [VERIFIED_RESULTS.md](VERIFIED_RESULTS.md) for the exact commands and
 outputs produced during development (backend tests, frontend checks, live
 end-to-end demo).
 
+## AI coding assistant disclosure
+
+This project was built with the assistance of an AI coding assistant
+(Codebuff / Google Antigravity) in accordance with the Graph Hacks 2026
+AI policy. All graph schema design, Cypher query logic, investigation
+ranking criteria, and test cases were authored and reviewed by the
+submitter. AI assistance was used for boilerplate, documentation
+formatting, and iteration speed. This is disclosed on the submission form.
+
 ## Limitations
 
 - The demo dataset is small and synthetic; ranking thresholds are tuned for it

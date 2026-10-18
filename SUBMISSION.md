@@ -71,7 +71,7 @@ submission form.
 | Check | Result |
 |---|---|
 | Backend pytest (live FalkorDB) | **33 passed**, idempotent across back-to-back runs |
-| Frontend vitest (jsdom) | **12 passed** |
+| Frontend vitest (jsdom) | **19 passed** |
 | Frontend lint / typecheck / production build | clean / clean / success |
 | End-to-end API demo (`python -m scripts.demo_e2e`) | **30/30 checks passed** |
 | Browser walkthrough (production build) | investigation, graph explorer, approve/reject, memory write+readback, 0 console errors |

@@ -34,7 +34,7 @@ payments server), `ALR-2026-10-0013` (high, malware on a marketing laptop).
 
 Click **ALR-2026-10-0011**. The graph explorer loads its live 2-hop
 neighborhood from FalkorDB (~22 nodes, ~32 relationships, ~7 activity edges).
-Highlight: solid blue edges are observed activity (`LOGGED_IN_FROM · 09:12`,
+Highlight: solid lime edges are observed activity (`LOGGED_IN_FROM · 09:12`,
 `CONNECTS_TO · 09:28`), dashed are inventory (`USED`). Click
 `dev:fin-ws-1042` to re-center the traversal — the query is a live,
 parameterized Cypher BFS.
@@ -84,12 +84,12 @@ backend restart.)
 ## 2:30–2:55 — Acting, with an approval gate
 
 In **Recommended actions (simulated)**: press **Approve** on
-`BLOCK_IP ip:203.0.113.44` → status flips to **APPROVED** with
-"decided by demo.analyst" and the recorded reason. Press **Reject** on a
-`REVIEW_DEVICE` → **REJECTED**. Then store a short analyst note in
-**Incident memory** and show it re-appearing (persisted in FalkorDB).
-Say: *"Nothing here touches a real firewall or EDR — a proposal cannot
-change state without an explicit analyst decision."*
+`BLOCK_IP ip:203.0.113.44` → confirm the decision → status flips to
+**APPROVED** with "decided by demo.analyst" and the recorded reason. Press
+**Reject** on a `REVIEW_DEVICE` → confirm → **REJECTED**. Then store a short
+analyst note in **Incident memory** and show it re-appearing (persisted in
+FalkorDB). Say: *"Nothing here touches a real firewall or EDR — a proposal
+cannot change state without an explicit analyst decision."*
 
 ## 2:55–3:00 — Close on the receipts
 
@@ -97,7 +97,7 @@ Terminal (optional but strong):
 
 ```bash
 cd backend  && python -m pytest tests/ -q    # 33 passed
-cd frontend && npm test                      # 12 passed
+cd frontend && npm test                      # 19 passed
 cd backend  && python -m scripts.demo_e2e    # 30/30 checks passed
 ```
 
